@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}BERT Query Intent Categorizer{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">BERT Query Intent Categorizer</h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead mb-4">Enter your query below and we'll categorize its intent using our BERT model.</p>
+                    
+                    <form id="query-form">
+                        <div class="form-group">
+                            <label for="query-input">Your Query:</label>
+                            <input type="text" class="form-control form-control-lg" id="query-input" 
+                                   placeholder="Enter your query..." required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg mt-3">Categorize</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert2 CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.all.min.js"></script>
+
+<!-- jQuery (required for AJAX) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Handle form submission
+    $('#query-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        const queryText = $('#query-input').val().trim();
+        if (!queryText) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please enter a query',
+                icon: 'error'
+            });
+            return;
+        }
+        
+        // Show loading state
+        Swal.fire({
+            title: 'Analyzing...',
+            text: 'Processing your query with BERT model',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
+        // Send AJAX request to categorize
+        $.ajax({
+            url: '{% url "categorizer:api_categorize" %}',
+            type: 'POST',
+            data: {
+                'query': queryText,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                // Show success message with the category
+                Swal.fire({
+                    title: 'Query Categorized!',
+                    text: `The intent of your query is: ${response.category}`,
+                    icon: 'success'
+                });
+            },
+            error: function(xhr) {
+                let errorMsg = 'An error occurred while processing your request.';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMsg = xhr.responseJSON.error;
+                }
+                
+                Swal.fire({
+                    title: 'Error!',
+                    text: errorMsg,
+                    icon: 'error'
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
