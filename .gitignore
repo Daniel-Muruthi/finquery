@@ -2,4 +2,4 @@ virtual/
 .env
 bert_intent_classifier.pth
 tuned_linear_svc_model.pkl
-.ipynb_checkpoints
+.ipynb_checkpoints/
