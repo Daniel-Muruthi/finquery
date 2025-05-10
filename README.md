@@ -1,4 +1,4 @@
-# FinQuery: Intelligent Banking Intent Classification for Customer Support
+# FinQuery: Customer Query Classification For Banking Customer Support Using NLP
 
 ## Overview
 
